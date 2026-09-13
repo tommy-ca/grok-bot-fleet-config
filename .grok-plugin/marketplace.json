@@ -7,8 +7,8 @@
   "plugins": [
     {
       "name": "grok-bot-fleet-config",
-      "description": "Grok Bot fleet-config.v1 — export/import/share pack (plugins, agents, skills, scripts). Zero hand-config bootstrap.",
-      "version": "1.0.0-grok-bot-fleet-config.0",
+      "description": "Grok Bot fleet-config.v1 \u2014 export/import/share pack (plugins, agents, skills, scripts). Zero hand-config bootstrap.",
+      "version": "1.0.0",
       "homepage": "https://github.com/tommy-ca/grok-bot-fleet-config",
       "license": "MIT",
       "keywords": [

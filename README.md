@@ -4,6 +4,29 @@ Grok Bot / Grok Build plugin for **scrubbed multi-agent fleet packs** (`fleet-co
 
 Serialize live fleet surfaces → verify dry-run → import / bootstrap onto another account — **without** packing secrets, agent/room UUIDs, or operator personal names.
 
+
+## Marketplace install
+
+### Cursor / Grok Bot (InstallPlugin)
+
+1. Repo must be **public**.
+2. Local test (optional): copy checkout to `~/.cursor/plugins/local/grok-bot-fleet-config`.
+3. Submit at https://cursor.com/marketplace/publish — after review you get a numeric plugin id for `InstallPlugin` / SearchPlugins.
+4. Manifest: `.cursor-plugin/plugin.json` (skills + agents).
+
+Until listed, use the fleet-config.v1 pack + [Fleet config bootstrap](sand-workflow:fleet-config-bootstrap) path.
+
+### Grok Build CLI
+
+```bash
+grok plugin install tommy-ca/grok-bot-fleet-config --trust
+grok plugin enable grok-bot-fleet-config
+# new grok session after enable
+```
+
+Or via catalog after sibling listing in `tommy-ca/grok-build-plugins`.
+
+
 ## Install
 
 ```bash
