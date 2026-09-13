@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/fleet-config.v1.json
+dist/README.md
+.DS_Store

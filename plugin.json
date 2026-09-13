@@ -1,0 +1,21 @@
+{
+  "name": "fleet-config",
+  "version": "1.0.0-fleet-config.0",
+  "description": "Grok Bot fleet-config.v1 — export, verify, import, and bootstrap scrubbed multi-agent fleet packs (plugins, rules, skills, agents, rooms).",
+  "author": {
+    "name": "tommy-ca"
+  },
+  "homepage": "https://github.com/tommy-ca/fleet-config",
+  "repository": "https://github.com/tommy-ca/fleet-config",
+  "license": "MIT",
+  "keywords": [
+    "fleet-config",
+    "grok-bot",
+    "grok-build",
+    "bootstrap",
+    "export",
+    "import"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/"
+}

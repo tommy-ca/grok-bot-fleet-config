@@ -1,0 +1,23 @@
+{
+  "name": "fleet-config",
+  "description": "Standalone Grok Bot / Grok Build plugin: scrubbed fleet-config.v1 export, verify, import, and bootstrap.",
+  "owner": {
+    "name": "tommy-ca"
+  },
+  "plugins": [
+    {
+      "name": "fleet-config",
+      "description": "Grok Bot fleet-config.v1 — export/import/share pack (plugins, agents, skills, scripts). Zero hand-config bootstrap.",
+      "version": "1.0.0-fleet-config.0",
+      "homepage": "https://github.com/tommy-ca/fleet-config",
+      "license": "MIT",
+      "keywords": [
+        "fleet-config",
+        "grok-bot",
+        "grok-build",
+        "bootstrap"
+      ],
+      "source": "."
+    }
+  ]
+}
