@@ -1,4 +1,4 @@
-# fleet-config
+# grok-bot-fleet-config
 
 Grok Bot / Grok Build plugin for **scrubbed multi-agent fleet packs** (`fleet-config.v1`).
 
@@ -8,7 +8,7 @@ Serialize live fleet surfaces → verify dry-run → import / bootstrap onto ano
 
 ```bash
 # from this repo (Grok Build / Grok plugin host)
-grok plugin install tommy-ca/fleet-config --trust
+grok plugin install tommy-ca/grok-bot-fleet-config --trust
 ```
 
 Or clone and point skills/scripts at the checkout. After enable, start a **new session** so skills resolve.
