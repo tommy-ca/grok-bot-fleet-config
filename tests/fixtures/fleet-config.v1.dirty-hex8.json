@@ -2,7 +2,7 @@
   "schema": "fleet-config.v1",
   "exportedAt": "2026-09-13T12:00:00Z",
   "source": {
-    "label": "scrubbed-fixture"
+    "label": "dirty-hex8-fixture"
   },
   "plugins": [
     {
@@ -52,6 +52,10 @@
     {
       "path": "openspec-binding.md",
       "content": "# OpenSpec binding (fixture)\n\nConvention pointer only.\n"
+    },
+    {
+      "path": "rooms-map.md",
+      "content": "# rooms-map (dirty fixture)\n\n| id | Intended name |\n| --- | --- |\n| fea03f4a | Eng lead |\n| 75b15bb0 | QStack |\n"
     }
   ],
   "agents": [
