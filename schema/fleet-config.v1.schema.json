@@ -124,6 +124,14 @@
         },
         "notes": { "type": "array", "items": { "type": "string" } }
       }
+    },
+    "hex8Allowlist": {
+      "type": "array",
+      "description": "Explicit 8-hex tokens permitted in fleetDocs[].content (lowercase)",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}$"
+      }
     }
   }
 }

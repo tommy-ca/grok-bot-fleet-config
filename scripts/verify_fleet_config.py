@@ -19,6 +19,11 @@ import sys
 from pathlib import Path
 import os
 
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+from lib_scrub import find_fleetdoc_hex8, normalize_hex8_allowlist  # noqa: E402
+
 _PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 PACK_ROOT = Path(os.environ.get("FLEET_PACK_ROOT", str(_PLUGIN_ROOT)))
 DEFAULT_PACK = Path(
@@ -212,6 +217,17 @@ def scrub_checks(pack: dict, v: Verdict) -> None:
     if '"chrome-cookie-seed.json"' in blob and "Never pack" not in blob:
         # filename string alone in a packed path field already caught; notes OK
         pass
+
+    allow = normalize_hex8_allowlist(pack.get("hex8Allowlist"))
+    hex_hits = find_fleetdoc_hex8(pack, allow)
+    if hex_hits:
+        # cite first few with path (rooms-map is the common offender)
+        cited = ", ".join(f"{doc_path}:{tok}" for doc_path, tok in hex_hits[:8])
+        more = f" (+{len(hex_hits) - 8} more)" if len(hex_hits) > 8 else ""
+        v.fail(
+            "scrub: fleetDocs hex8 residue (\\b[0-9a-f]{8}\\b) not allowlisted: "
+            f"{cited}{more}"
+        )
 
 
 def dry_run_import(pack: dict, v: Verdict) -> None:

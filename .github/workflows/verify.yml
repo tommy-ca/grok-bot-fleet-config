@@ -14,5 +14,32 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Verify minimal fixture
+      - name: Install jsonschema (strict schema-check when available)
+        run: python3 -m pip install -q jsonschema
+      - name: Verify minimal fixture PASS
         run: python3 scripts/verify_fleet_config.py tests/fixtures/fleet-config.v1.min.json
+      - name: Verify dirty hex8 fixture FAIL
+        run: |
+          set +e
+          out=$(python3 scripts/verify_fleet_config.py tests/fixtures/fleet-config.v1.dirty-hex8.json 2>&1)
+          code=$?
+          set -e
+          echo "$out"
+          if [ "$code" -eq 0 ]; then
+            echo "expected non-zero exit for dirty hex8 fixture"
+            exit 1
+          fi
+          echo "$out" | grep -q "RESULT: FAIL"
+          echo "$out" | grep -q "rooms-map"
+      - name: Seed dry-run lists three slugs
+        run: |
+          out=$(python3 scripts/seed_fleet_config_skills.py \
+            --pack tests/fixtures/fleet-config.v1.min.json \
+            --out /tmp/seed-ci \
+            --dry-run)
+          echo "$out"
+          echo "$out" | grep -q fleet-config-export
+          echo "$out" | grep -q fleet-config-import
+          echo "$out" | grep -q fleet-config-bootstrap
+      - name: Unit scrub hex8
+        run: python3 tests/test_scrub_hex8.py
