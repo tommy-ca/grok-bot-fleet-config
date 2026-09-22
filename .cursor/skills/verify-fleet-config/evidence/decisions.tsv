@@ -1,0 +1,6 @@
+ts	phase	decision	why	evidence	result
+2026-09-22T10:27:59Z	frame	scoped FC-2 to .cursor/skills/verify-fleet-config only	plan file boundary; docs/verify-evidence outside boundary so evidence stays under skill/evidence	plan FC-2 Files + user hard rules	boundary locked
+2026-09-22T10:28:20Z	build	wrote Launch/Doctor/Drive/Evidence/Cleanup/Helpers skill plus four feature files	create-verification-skill shape; CLI surface not browser	.cursor/skills/verify-fleet-config/SKILL.md features/*	map shipped
+2026-09-22T10:28:30Z	seed	documented seed_fleet_config_skills.py and marked Drive skip until FC-1	script missing on main; still ship map entry	features/seed-skills.md evidence/drive-seed-skills-SKIP.txt	SKIP documented
+2026-09-22T10:28:44Z	prove	ran Doctor then Drive verify-pack on min fixture	prove generated skill before handoff	evidence/doctor.txt evidence/drive-verify-pack.txt	Doctor exit 0; RESULT PASS
+2026-09-22T10:28:44Z	perf	Doctor median under 2.0s absolute	plan Verify perf rule	evidence/doctor-perf.txt (0.005/0.005/0.004)	median 0.005s PASS

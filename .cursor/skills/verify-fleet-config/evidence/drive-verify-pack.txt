@@ -1,0 +1,22 @@
+=== drive-verify-pack 2026-09-22T12:28:44+02:00 ===
+feature: verify-pack
+cmd: python3 scripts/verify_fleet_config.py tests/fixtures/fleet-config.v1.min.json
+VERIFY fleet-config.v1 (dry-run import; does not mutate this account)
+pack:    /workspace/grok-bot-fleet-config/.worktrees/feature/fc2-verify-skill/tests/fixtures/fleet-config.v1.min.json
+schema:  /workspace/grok-bot-fleet-config/.worktrees/feature/fc2-verify-skill/schema/fleet-config.v1.schema.json  exists=True
+readme:  /workspace/grok-bot-fleet-config/.worktrees/feature/fc2-verify-skill/dist/README.md  exists=False
+schema-check: jsonschema
+COUNTS: agents=3 skills=2 rules=1 rooms=2 plugins=2 fleetDocs=2 routines=2
+plugins: ['pstack', 'fleet-config']
+agents: ['bot-designer=Example Designer(1)', 'eng-orch=Example Orch(0)', 'planner=Example Planner(1)']
+rooms: ['Eng lead[eng-orch,planner,bot-designer]', 'Fleet meta[bot-designer]']
+  INFO  jsonschema OK against /workspace/grok-bot-fleet-config/.worktrees/feature/fc2-verify-skill/schema/fleet-config.v1.schema.json
+  INFO  bootstrap.order: plugins → rules → skills → agents → rooms → healthchecks
+  INFO  live rooms not packed (ad-hoc / leftover — importer must not recreate): ['ChronForge', 'Todd Liu, Horizon, Drove, Heavilifter, Planner, Cloud Agent Orchestrator', 'Ferro', 'grok-build-plugins', 'Mulvad Relay List', 'Dev Env', 'QStack']
+  INFO  packed skills not on this box: ['example-skill']
+  WARN  live agents not packed: ['dr eggbot', "Lingxi's Engineer Bot", 'Drove', 'Disk Saver', 'Sweeper / 清道夫', 'Wiki', 'Planner', 'Herd', 'Horizon', 'Secretary', 'grok-bot-fleet-config', 'Cloud Agent Orchestrator', 'Opus', 'Nightly Audit Engineer', 'Heavilifter']
+  WARN  live workflow SKILL.md not packed: ['approvals-journal', 'coordination-layer', 'delegate-to-agy', 'design-a-grok-bot', 'desk', 'drove-external-loop', 'eng-lead-merge-authority', 'engineering-playbook', 'external-coding-agents', 'field-guide', 'fleet-config-bootstrap', 'fleet-config-import', 'fleet-org-raci', 'fleet-roles-map', 'grok-bot-skills', 'grok-bot-worktree-isolation', 'herd-failure-journal', 'herd-with-herdr', 'inner-outer-orch', 'llm-wiki', 'long-horizon-swarm', 'make-bot-ui', 'megafile-gate', 'openspec-intent-driven', 'openspec-intent-flow', 'ossify-break', 'planner-worker-split', 'project-room-isolation', 'qstack-overlay', 'review-lenses', 'routine-healthcheck', 'secretary-cadence', 'setup-pstack-herdr-agents', 'thermos-review', 'transcript-healthcheck', 'using-git-worktrees']
+  WARN  live ~/.cursor/rules not packed: ['pstack-herdr-agents.mdc', 'pstack-models.mdc']
+RESULT: PASS  pack=/workspace/grok-bot-fleet-config/.worktrees/feature/fc2-verify-skill/tests/fixtures/fleet-config.v1.min.json
+real 0.132
+EXIT:0
