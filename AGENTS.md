@@ -1,4 +1,4 @@
-# fleet-config — agent notes
+# fleet-config agent notes
 
 Plugin for scrubbed `fleet-config.v1` export / verify / import / bootstrap. Not an application server.
 
@@ -13,11 +13,13 @@ CI runs the same command via `.github/workflows/verify.yml`.
 ## Spawn / persona
 
 - Agent file: `agents/fleet-config.md` (plugin id `fleet-config`)
-- Skills under `skills/` — cite as `fleet-config-export`, `fleet-config-import`, `fleet-config-bootstrap`
+- Skills under `skills/` cite as `fleet-config-export`, `fleet-config-import`, `fleet-config-bootstrap`
 
 ## Scripts
 
-Prefer `scripts/serialize_fleet_config.py` and `scripts/verify_fleet_config.py` with env overrides (`FLEET_*`) over hand-rolled JSON.
+Prefer `scripts/serialize_fleet_config.py`, `scripts/verify_fleet_config.py`, and `scripts/seed_fleet_config_skills.py` with env overrides (`FLEET_*`) over hand-rolled JSON.
+
+Cold-start for gist recipients: seed from pack (default). Repo-copy of `skills/fleet-config-*` when a clone exists. See README cold-start.
 
 ## Do not
 

@@ -1,10 +1,10 @@
-# fleet-config — workflow map
+# fleet-config workflow map
 
 Pointer/index for export → verify → import → bootstrap. **Not** a second source of truth; skill bodies under `skills/` own the steps.
 
 ---
 tracker:
-  board: fleet pack handoff + bootstrap journal
+  board: verify pack handoff + bootstrap journal
 polling:
   tick: on-demand (operator / Fleet Config bot)
 workspace:
@@ -27,16 +27,20 @@ observability:
 | Fleet config bootstrap | [Fleet config bootstrap](sand-workflow:fleet-config-bootstrap) |
 | Design a Grok Bot | [Design a Grok Bot](sand-workflow:design-a-grok-bot) |
 
+## Cold-start
+
+See README **Cold-start**: pack-extract via `scripts/seed_fleet_config_skills.py` is the default for gist recipients; repo-copy of `skills/fleet-config-*` is the alternate when a clone already exists.
+
 ## Loop
 
 ```
 serialize  →  verify (dry-run)  →  handoff  →  verify on dest  →  import  →  healthchecks
 ```
 
-1. **Export** — `python3 scripts/serialize_fleet_config.py` → `dist/fleet-config.v1.json`
-2. **Verify** — `python3 scripts/verify_fleet_config.py <pack>` must exit 0
-3. **Bootstrap / import** — follow bootstrap skill order: plugins → rules → skills → agents → rooms → healthchecks
-4. **Journal** — create-vs-skip + operator leftovers (host CLIs, New Bot sidebar)
+1. **Export**: `python3 scripts/serialize_fleet_config.py` → `dist/fleet-config.v1.json`
+2. **Verify**: `python3 scripts/verify_fleet_config.py <pack>` must exit 0
+3. **Bootstrap / import**: follow bootstrap skill order: plugins → rules → skills → agents → rooms → healthchecks
+4. **Journal**: create-vs-skip + operator leftovers (host CLIs, New Bot sidebar)
 
 ## Eligibility
 

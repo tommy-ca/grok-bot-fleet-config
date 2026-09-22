@@ -2,7 +2,7 @@
 name: Fleet config bootstrap
 description: >-
   when standing up a fresh Grok Bot account from a fleet pack or after template
-  import — orchestrates import + healthchecks
+  import; orchestrates import + healthchecks
 ---
 # Fleet config bootstrap
 
@@ -16,14 +16,14 @@ Stand up a **fresh** Grok Bot account (or heal a thin install) from a `fleet-con
 
 ## Steps
 
-1. Locate pack (`fleet-config.v1.json`) — default `dist/fleet-config.v1.json` or operator-provided path.
+1. Locate pack (`fleet-config.v1.json`): default `dist/fleet-config.v1.json` or operator-provided path. If the three fleet-config skills are missing, follow README cold-start (pack-extract seed default; repo-copy alternate).
 2. **Dry-run verify** (must PASS before mutate):
    ```bash
    python3 scripts/verify_fleet_config.py /path/to/fleet-config.v1.json
    ```
-3. Run **[Fleet config import](sand-workflow:fleet-config-import)** end-to-end (validate → plugins → rules → skills → fleet docs → agents → rooms → journal).
+3. Run **[Fleet config import](sand-workflow:fleet-config-import)** end-to-end (validate → plugins → rules → skills → fleet docs → agents → rooms → journal). Import is match-by-name idempotent for agents, rooms, and routines; it never deletes.
 4. **setup-pstack**: if `~/.cursor/rules/pstack-models.mdc` is missing, run pstack `/setup-pstack` (do not ask). Skip if present.
-5. **Designer fresh install**: on the bot-designer agent, follow [Design a Grok Bot](sand-workflow:design-a-grok-bot) fresh-install — ensure `transcript-healthcheck` and `routine-healthcheck` routines exist.
+5. **Designer fresh install**: on the bot-designer agent, follow [Design a Grok Bot](sand-workflow:design-a-grok-bot) fresh-install; ensure `transcript-healthcheck` and `routine-healthcheck` routines exist.
 6. Optional: offer Routine healthcheck across all bots once.
 7. Confirm rooms Eng lead / QStack / Ferro / Fleet meta (or pack equivalents) exist; note any operator sidebar cleanup for duplicates.
 
@@ -37,7 +37,7 @@ If the operator only imported a **single** bot template via `create_bot_share_js
 
 ## Sandbox note
 
-Fleet pack does **not** copy host CLI wrappers or PATH. After import on a Grok Bot sandbox, Opus (or operator) must reinstall sandbox permissions / host CLIs as needed. Do not pack OAuth tokens or credentials.
+Fleet pack does **not** copy `~/bin/agy` wrappers or host PATH. After import on a Grok Bot sandbox, Opus (or operator) must reinstall sandbox permissions per `/home/box/reference/agy-sandbox-permissions.md` when that reference exists on the box. Do not document brief-only skip-permissions as the default. Do not pack OAuth tokens or credentials.
 
 ## Done when
 

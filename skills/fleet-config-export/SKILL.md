@@ -39,8 +39,8 @@ Do not use this pack for a single-bot public template card.
    - `rules`: `~/.cursor/rules/*.mdc` (fleet-roles, pstack-herdr-agents, pstack-models, …)
    - `skills`: `/home/box/agent-data/workflows/*/SKILL.md` (slug, name, description, body)
    - `fleetDocs`: roles-map, rooms-map, registry, concurrency, pstack-herdr-agents, openspec binding note
-   - `agents`: live personas by `roleKey` (skip empty **New Bot**); routines as **recipes** (slug, name, description, scheduleOrTriggerIntent, prompt) — never automation run ids
-   - `rooms`: name, charter, memberRoleKeys (max 6) — no room UUIDs; collapse duplicate mixed rooms out of the pack
+   - `agents`: live personas by `roleKey` (skip empty **New Bot**); routines as **recipes** (slug, name, description, scheduleOrTriggerIntent, prompt); never automation run ids
+   - `rooms`: name, charter, memberRoleKeys (max 6); no room UUIDs; collapse duplicate mixed rooms out of the pack
    - `bootstrap.order`: plugins → rules → skills → agents → rooms → healthchecks
 
 3. **Scrub (public / teammate mode)**
@@ -62,8 +62,8 @@ Do not use this pack for a single-bot public template card.
 
 6. **Hand off**
    - Offer the dist path: `dist/fleet-config.v1.json` (or `$FLEET_DIST_DIR/fleet-config.v1.json`)
-   - Teammate options: private gist, shared repo, or file drop
-   - Point importer at [Fleet config bootstrap](sand-workflow:fleet-config-bootstrap)
+   - Teammate options: private gist (invite or file-drop), shared repo, or file drop
+   - Point importer at README cold-start + [Fleet config bootstrap](sand-workflow:fleet-config-bootstrap)
 
 ## Done when
 
