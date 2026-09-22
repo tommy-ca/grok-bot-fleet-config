@@ -2,7 +2,7 @@
 """Serialize live Grok Bot fleet surfaces into a scrubbed fleet-config.v1 pack.
 
 Reads agent profiles (skips empty New Bot), workflow SKILL.md files, ~/.cursor/rules/*.mdc,
-and key fleet docs. Scrubs operator names and UUIDs.
+and key fleet docs. Scrubs operator names, UUIDs, and rooms-map hex8 short ids.
 Writes dist/fleet-config.v1.json + dist/README.md. Prints output path; exits 0.
 
 Env overrides (default to Grok Bot box paths):
@@ -12,11 +12,21 @@ Env overrides (default to Grok Bot box paths):
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-import os
+
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+from lib_scrub import (  # noqa: E402
+    DEFAULT_ROOM_SHORT_IDS,
+    extract_hex8_room_names,
+    find_fleetdoc_hex8,
+    scrub_hex8,
+)
 
 _PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 
@@ -157,7 +167,11 @@ BOOTSTRAP = {
 }
 
 
-def scrub(text: str, uuid_to_role: dict[str, str] | None = None) -> str:
+def scrub(
+    text: str,
+    uuid_to_role: dict[str, str] | None = None,
+    id_to_name: dict[str, str] | None = None,
+) -> str:
     if not text:
         return text
     out = text
@@ -169,7 +183,7 @@ def scrub(text: str, uuid_to_role: dict[str, str] | None = None) -> str:
     out = out.replace("tommy-ca/ferro-flux", "the watched ferro repo")
     out = out.replace("tommy-ca/", "the-watched-org/")
     out = re.sub(r"\btommy-ca\b", "the-watched-org", out)
-    # UUID → roleKey when known, else drop token
+    # UUID → roleKey when known, else drop token (before hex8: UUID head is 8 hex)
     def _uuid_sub(m: re.Match[str]) -> str:
         u = m.group(0).lower()
         if uuid_to_role and u in uuid_to_role:
@@ -179,9 +193,19 @@ def scrub(text: str, uuid_to_role: dict[str, str] | None = None) -> str:
         return "[id]"
 
     out = UUID_RE.sub(_uuid_sub, out)
+    # Short room ids → room:<name> or [room-id]
+    out = scrub_hex8(out, id_to_name)
     # Soft scrub of "Horizon operator" room naming leftovers
     out = out.replace("Horizon operator", "Eng lead")
     return out
+
+
+def collect_room_id_map() -> dict[str, str]:
+    mapping = dict(DEFAULT_ROOM_SHORT_IDS)
+    rooms_map = FLEET_DIR / "rooms-map.md"
+    if rooms_map.is_file():
+        mapping.update(extract_hex8_room_names(rooms_map.read_text()))
+    return mapping
 
 
 def parse_skill_frontmatter(text: str) -> tuple[str, str, str]:
@@ -237,7 +261,10 @@ def collect_uuid_maps() -> dict[str, str]:
     return mapping
 
 
-def load_agents(uuid_to_role: dict[str, str]) -> list[dict]:
+def load_agents(
+    uuid_to_role: dict[str, str],
+    id_to_name: dict[str, str] | None = None,
+) -> list[dict]:
     agents: list[dict] = []
     if not AGENTS_DIR.is_dir():
         return agents
@@ -271,7 +298,7 @@ def load_agents(uuid_to_role: dict[str, str]) -> list[dict]:
                 if aj.name in SECRET_BASENAMES:
                     continue
                 a = json.loads(aj.read_text())
-                prompt = scrub(a.get("prompt") or "", uuid_to_role)
+                prompt = scrub(a.get("prompt") or "", uuid_to_role, id_to_name)
                 schedule = a.get("schedule") or ""
                 trig = a.get("triggerPresentation") or {}
                 intent = schedule
@@ -288,8 +315,11 @@ def load_agents(uuid_to_role: dict[str, str]) -> list[dict]:
                         "description": scrub(
                             (a.get("name") or sub.name) + " routine recipe",
                             uuid_to_role,
+                            id_to_name,
                         ),
-                        "scheduleOrTriggerIntent": scrub(str(intent), uuid_to_role),
+                        "scheduleOrTriggerIntent": scrub(
+                            str(intent), uuid_to_role, id_to_name
+                        ),
                         "prompt": prompt,
                     }
                 )
@@ -297,7 +327,7 @@ def load_agents(uuid_to_role: dict[str, str]) -> list[dict]:
             {
                 "roleKey": role_key,
                 "name": name,
-                "description": scrub(desc, uuid_to_role),
+                "description": scrub(desc, uuid_to_role, id_to_name),
                 "routines": routines,
             }
         )
@@ -306,7 +336,10 @@ def load_agents(uuid_to_role: dict[str, str]) -> list[dict]:
     return agents
 
 
-def load_skills(uuid_to_role: dict[str, str]) -> list[dict]:
+def load_skills(
+    uuid_to_role: dict[str, str],
+    id_to_name: dict[str, str] | None = None,
+) -> list[dict]:
     skills: list[dict] = []
     if not WORKFLOWS_DIR.is_dir():
         return skills
@@ -319,15 +352,18 @@ def load_skills(uuid_to_role: dict[str, str]) -> list[dict]:
         skills.append(
             {
                 "slug": d.name,
-                "name": scrub(name or d.name, uuid_to_role),
-                "description": scrub(desc or "", uuid_to_role),
-                "body": scrub(body, uuid_to_role),
+                "name": scrub(name or d.name, uuid_to_role, id_to_name),
+                "description": scrub(desc or "", uuid_to_role, id_to_name),
+                "body": scrub(body, uuid_to_role, id_to_name),
             }
         )
     return skills
 
 
-def load_rules(uuid_to_role: dict[str, str]) -> list[dict]:
+def load_rules(
+    uuid_to_role: dict[str, str],
+    id_to_name: dict[str, str] | None = None,
+) -> list[dict]:
     rules: list[dict] = []
     if not RULES_DIR.is_dir():
         return rules
@@ -335,19 +371,28 @@ def load_rules(uuid_to_role: dict[str, str]) -> list[dict]:
         rules.append(
             {
                 "path": p.name,
-                "content": scrub(p.read_text(), uuid_to_role),
+                "content": scrub(p.read_text(), uuid_to_role, id_to_name),
             }
         )
     return rules
 
 
-def load_fleet_docs(uuid_to_role: dict[str, str]) -> list[dict]:
+def load_fleet_docs(
+    uuid_to_role: dict[str, str],
+    id_to_name: dict[str, str] | None = None,
+) -> list[dict]:
     docs: list[dict] = []
     for rel in FLEET_DOC_PATHS:
         p = FLEET_DIR / rel
         if not p.is_file():
             continue
-        docs.append({"path": rel, "content": scrub(p.read_text(), uuid_to_role)})
+        raw = p.read_text()
+        doc_map = dict(id_to_name or DEFAULT_ROOM_SHORT_IDS)
+        if rel == "rooms-map.md":
+            doc_map.update(extract_hex8_room_names(raw))
+        docs.append(
+            {"path": rel, "content": scrub(raw, uuid_to_role, doc_map)}
+        )
     # Light openspec binding pointer (not full change trees)
     openspec_readme = FLEET_DIR / "openspec"
     binding_note = (
@@ -361,7 +406,7 @@ def load_fleet_docs(uuid_to_role: dict[str, str]) -> list[dict]:
     docs.append(
         {
             "path": "openspec-binding.md",
-            "content": scrub(binding_note, uuid_to_role),
+            "content": scrub(binding_note, uuid_to_role, id_to_name),
         }
     )
     return docs
@@ -483,31 +528,38 @@ def assert_scrub(pack: dict) -> None:
     # no raw secret file contents (empty objects are fine if never read)
     if '"apiKey"' in blob or '"password"' in blob:
         raise SystemExit("scrub check failed: credential-looking keys in pack")
+    hex_hits = find_fleetdoc_hex8(pack)
+    if hex_hits:
+        sample = ", ".join(f"{p}:{t}" for p, t in hex_hits[:8])
+        raise SystemExit(
+            f"scrub check failed: fleetDocs hex8 residue still present: {sample}"
+        )
 
 
 def main() -> int:
     DIST_DIR.mkdir(parents=True, exist_ok=True)
     uuid_to_role = collect_uuid_maps()
+    id_to_name = collect_room_id_map()
     pack = {
         "schema": "fleet-config.v1",
         "exportedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": {"label": "scrubbed"},
         "plugins": load_plugins(),
-        "rules": load_rules(uuid_to_role),
-        "skills": load_skills(uuid_to_role),
-        "fleetDocs": load_fleet_docs(uuid_to_role),
-        "agents": load_agents(uuid_to_role),
+        "rules": load_rules(uuid_to_role, id_to_name),
+        "skills": load_skills(uuid_to_role, id_to_name),
+        "fleetDocs": load_fleet_docs(uuid_to_role, id_to_name),
+        "agents": load_agents(uuid_to_role, id_to_name),
         "rooms": [
             {
                 "name": r["name"],
-                "charter": scrub(r["charter"], uuid_to_role),
+                "charter": scrub(r["charter"], uuid_to_role, id_to_name),
                 "memberRoleKeys": list(r["memberRoleKeys"]),
             }
             for r in ROOMS
         ],
         "bootstrap": {
             "order": list(BOOTSTRAP["order"]),
-            "notes": [scrub(n, uuid_to_role) for n in BOOTSTRAP["notes"]],
+            "notes": [scrub(n, uuid_to_role, id_to_name) for n in BOOTSTRAP["notes"]],
         },
     }
     assert_scrub(pack)
